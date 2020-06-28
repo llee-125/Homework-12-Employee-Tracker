@@ -4,13 +4,10 @@ var inquirer = require("inquirer");
 var connection = mysql.createConnection({
   host: "localhost",
 
-  // Your port; if not 3306
   port: 3306,
 
-  // Your username
   user: "root",
 
-  // Your password
   password: "Popover2020!",
   database: "employee_tracker",
 });
@@ -63,43 +60,43 @@ function searchEmployees() {
           break;
 
         case "View all employees by department":
-          multiSearch();
+          viewEmployeesByDepartment();
           break;
 
         case "Add employee":
-          rangeSearch();
+          addEmployee();
           break;
 
         case "Remove employee":
-          songSearch();
+          removeEmployee();
           break;
 
         case "Update employee role":
-          songAndAlbumSearch();
+          updateEmployeeRole();
           break;
 
         case "Add role":
-          songAndAlbumSearch();
+          addRole();
           break;
 
         case "Remove role":
-          songAndAlbumSearch();
+          removeRole();
           break;
 
         case "View roles":
-          songAndAlbumSearch();
+          viewRoles();
           break;
 
         case "Add department":
-          songAndAlbumSearch();
+          addDepartment();
           break;
 
         case "View department":
-          songAndAlbumSearch();
+          viewDepartment();
           break;
 
         case "Remove department":
-          songAndAlbumSearch();
+          removeDepartment();
           break;
 
         default:
@@ -118,62 +115,37 @@ function viewAllEmployees() {
   });
 }
 
-function viewAllEmployeesByDepartment() {
-  var query = "SELECT artist FROM top5000 GROUP BY artist HAVING count(*) > 1";
-  connection.query(query, function (err, res) {
-    for (var i = 0; i < res.length; i++) {
-      console.log(res[i].artist);
-    }
-    searchEmployees();
-  });
-}
-
-function rangeSearch() {
+function viewEmployeesByDepartment() {
   inquirer
-    .prompt([
-      {
-        name: "start",
-        type: "input",
-        message: "Enter starting position: ",
-        validate: function (value) {
-          if (isNaN(value) === false) {
-            return true;
-          }
-          return false;
-        },
-      },
-      {
-        name: "end",
-        type: "input",
-        message: "Enter ending position: ",
-        validate: function (value) {
-          if (isNaN(value) === false) {
-            return true;
-          }
-          return false;
-        },
-      },
-    ])
-    .then(function (answer) {
+    .prompt({
+      name: "employeesByDepartment",
+      type: "rawlist",
+      message: "What department would you like to view?",
+      choices: ["Sales", "Marketing", "Accounts Payable", "IT", "exit"],
+    })
+    .then(function (a) {
       var query =
-        "SELECT position,song,artist,year FROM top5000 WHERE position BETWEEN ? AND ?";
-      connection.query(query, [answer.start, answer.end], function (err, res) {
-        for (var i = 0; i < res.length; i++) {
-          console.log(
-            "Position: " +
-              res[i].position +
-              " || Song: " +
-              res[i].song +
-              " || Artist: " +
-              res[i].artist +
-              " || Year: " +
-              res[i].year
-          );
-        }
+        "SELECT employee.id, employee.fname, employee.lname, role.title, department.name AS department, role.salary, CONCAT(manager.fname, ' ', manager.lname)";
+      connection.query(query, function (err, res) {
+        if (err) throw err;
+        console.table(res);
         searchEmployees();
       });
     });
 }
+
+const addEmployee = (userText) => {
+  return new Promise((res, rej) => {
+    connection.query(
+      "INSERT INTO employee SET ?",
+      [{ text: userText }],
+      (err) => {
+        err ? rej(err) : res({ msg: "success" });
+        console.table(res);
+      }
+    );
+  });
+};
 
 function songSearch() {
   inquirer
