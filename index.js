@@ -3,11 +3,8 @@ var inquirer = require("inquirer");
 
 var connection = mysql.createConnection({
   host: "localhost",
-
   port: 3306,
-
   user: "root",
-
   password: "Popover2020!",
   database: "employee_tracker",
 });
@@ -134,7 +131,7 @@ function viewEmployeesByDepartment() {
     });
 }
 
-const addEmployee = (userText) => {
+function addEmployee(userText) {
   return new Promise((res, rej) => {
     connection.query(
       "INSERT INTO employee SET ?",
@@ -145,19 +142,19 @@ const addEmployee = (userText) => {
       }
     );
   });
-};
+}
 
-function songSearch() {
+function removeEmployee() {
   inquirer
     .prompt({
-      name: "song",
+      name: "list",
       type: "input",
-      message: "What song would you like to look for?",
+      message: "Which employee would you like to remove?",
     })
     .then(function (answer) {
       console.log(answer.song);
       connection.query(
-        "SELECT * FROM top5000 WHERE ?",
+        "SELECT * FROM employee.fname WHERE ?",
         { song: answer.song },
         function (err, res) {
           console.log(
