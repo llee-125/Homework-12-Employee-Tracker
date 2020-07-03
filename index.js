@@ -120,35 +120,35 @@ function viewAllEmployees() {
 function viewEmployeesByDepartment() {
   inquirer
     .prompt({
-      name: "employeesByDepartment",
-      type: "input",
+      name: "action",
+      type: "rawlist",
       message: "What department would you like to view?",
       choices: ["Sales", "Marketing", "Accounts Payable", "IT", "exit"],
     })
-    .then(function (a) {
-      return new Promise((resolve, reject) => {
-        connection.query(
-          "SELECT * FROM employee LEFT JOIN role on employee.role_id=role.id WHERE ?",
-          [{ text: userText }],
-          (err, data) => {
-            err ? reject(err) : resolve(data);
-            console.table(res);
-          }
-        );
+    .then(function (answer) {
+      var query =
+        "SELECT * FROM employee LEFT JOIN role on employee.role_id=role.id WHERE ?";
+      connection.query(query, { department: answer.department }, function (
+        err,
+        res
+      ) {
+        console.table(res);
       });
     });
 
   function addEmployee(userText) {
-    return new Promise((res, rej) => {
-      connection.query(
-        "INSERT INTO employee SET ?",
-        [{ text: userText }],
-        (err) => {
-          err ? rej(err) : res({ msg: "success" });
+    inquirer
+      .prompt({
+        name: "action",
+        type: "input",
+        message: "Enter the employee you would like to add.",
+      })
+      .then(function (answer) {
+        var query = "INSERT INTO employee SET ?";
+        connection.query(query, { text: userText }, function (err, res) {
           console.table(res);
-        }
-      );
-    });
+        });
+      });
   }
 
   function removeEmployee() {
@@ -222,8 +222,7 @@ function viewEmployeesByDepartment() {
         });
       });
   }
-
-  const quit = () => {
-    process.exit();
-  };
 }
+const quit = () => {
+  process.exit();
+};
