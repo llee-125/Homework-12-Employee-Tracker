@@ -168,6 +168,10 @@ function addEmployee(userText) {
         let role_id;
         if (answer.role === "Secretary") {
           role_id = 1;
+        } else if (answer.role === "SecretaryII") {
+          role_id = 2;
+        } else if (answer.role === "Manager") {
+          role_id = 3;
         }
         var query =
           "INSERT INTO Employee (fname, lname, role_id) VALUES (?, ?, ?)";
