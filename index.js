@@ -120,109 +120,140 @@ function viewAllEmployees() {
 function viewEmployeesByDepartment() {
   inquirer
     .prompt({
-      name: "action",
+      name: "department",
       type: "rawlist",
       message: "What department would you like to view?",
       choices: ["Sales", "Marketing", "Accounts Payable", "IT", "exit"],
     })
     .then(function (answer) {
-      var query =
-        "SELECT * FROM employee LEFT JOIN role on employee.role_id=role.id WHERE ?";
-      connection.query(query, { department: answer.department }, function (
-        err,
-        res
-      ) {
+      var query = `SELECT employee.id, employee.fname, employee.lname, role.title, department.name AS department, role.salary, 
+        CONCAT(manager.fname, ' ', manager.lname) AS manager 
+        FROM employee 
+        LEFT JOIN role on employee.role_id = role.id 
+        LEFT JOIN department on role.dept_id = department.id 
+        LEFT JOIN employee manager on manager.id = employee.manager_id WHERE department.name = ?`;
+
+      connection.query(query, [answer.department], function (err, res) {
         console.table(res);
       });
     });
+}
 
-  function addEmployee(userText) {
+function addEmployee(userText) {
+  const query_role = "SELECT * FROM Role";
+  connection.query(query_role, function (err, res) {
+    const roles = res.map((element) => element.title);
+    console.log(roles);
     inquirer
-      .prompt({
-        name: "action",
-        type: "input",
-        message: "Enter the employee you would like to add.",
-      })
+      .prompt([
+        {
+          name: "firstName",
+          type: "input",
+          message:
+            "Enter the employee's first name that you would like to add.",
+        },
+        {
+          name: "lastName",
+          type: "input",
+          message: "Enter the employee's last name that you would like to add.",
+        },
+        {
+          name: "role",
+          type: "rawlist",
+          message: "Select the new employee's role that you would like to add.",
+          choices: roles,
+        },
+      ])
       .then(function (answer) {
-        var query = "INSERT INTO employee SET ?";
-        connection.query(query, { text: userText }, function (err, res) {
-          console.table(res);
-        });
-      });
-  }
-
-  function removeEmployee() {
-    inquirer
-      .prompt({
-        name: "list",
-        type: "input",
-        message: "Which employee would you like to remove?",
-      })
-      .then(function (answer) {
-        console.log(answer.song);
+        let role_id;
+        if (answer.role === "Secretary") {
+          role_id = 1;
+        }
+        var query =
+          "INSERT INTO Employee (fname, lname, role_id) VALUES (?, ?, ?)";
         connection.query(
-          "SELECT * FROM employee.fname WHERE ?",
-          { song: answer.song },
+          query,
+          [answer.firstName, answer.lastName, role_id],
           function (err, res) {
-            console.log(
-              "Position: " +
-                res[0].position +
-                " || Song: " +
-                res[0].song +
-                " || Artist: " +
-                res[0].artist +
-                " || Year: " +
-                res[0].year
-            );
-            searchEmployees();
+            console.log("Successfully added the employee!");
           }
         );
       });
-  }
-
-  function songAndAlbumSearch() {
-    inquirer
-      .prompt({
-        name: "artist",
-        type: "input",
-        message: "What artist would you like to search for?",
-      })
-      .then(function (answer) {
-        var query =
-          "SELECT top_albums.year, top_albums.album, top_albums.position, top5000.song, top5000.artist ";
-        query +=
-          "FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year ";
-        query +=
-          "= top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position";
-
-        connection.query(query, [answer.artist, answer.artist], function (
-          err,
-          res
-        ) {
-          console.log(res.length + " matches found!");
-          for (var i = 0; i < res.length; i++) {
-            console.log(
-              i +
-                1 +
-                ".) " +
-                "Year: " +
-                res[i].year +
-                " Album Position: " +
-                res[i].position +
-                " || Artist: " +
-                res[i].artist +
-                " || Song: " +
-                res[i].song +
-                " || Album: " +
-                res[i].album
-            );
-          }
-
-          searchEmployees();
-        });
-      });
-  }
+  });
 }
+
+function removeEmployee() {
+  inquirer
+    .prompt({
+      name: "list",
+      type: "input",
+      message: "Which employee would you like to remove?",
+    })
+    .then(function (answer) {
+      console.log(answer.song);
+      connection.query(
+        "SELECT * FROM employee.fname WHERE ?",
+        { song: answer.song },
+        function (err, res) {
+          console.log(
+            "Position: " +
+              res[0].position +
+              " || Song: " +
+              res[0].song +
+              " || Artist: " +
+              res[0].artist +
+              " || Year: " +
+              res[0].year
+          );
+          searchEmployees();
+        }
+      );
+    });
+}
+
+function songAndAlbumSearch() {
+  inquirer
+    .prompt({
+      name: "artist",
+      type: "input",
+      message: "What artist would you like to search for?",
+    })
+    .then(function (answer) {
+      var query =
+        "SELECT top_albums.year, top_albums.album, top_albums.position, top5000.song, top5000.artist ";
+      query +=
+        "FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year ";
+      query +=
+        "= top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position";
+
+      connection.query(query, [answer.artist, answer.artist], function (
+        err,
+        res
+      ) {
+        console.log(res.length + " matches found!");
+        for (var i = 0; i < res.length; i++) {
+          console.log(
+            i +
+              1 +
+              ".) " +
+              "Year: " +
+              res[i].year +
+              " Album Position: " +
+              res[i].position +
+              " || Artist: " +
+              res[i].artist +
+              " || Song: " +
+              res[i].song +
+              " || Album: " +
+              res[i].album
+          );
+        }
+
+        searchEmployees();
+      });
+    });
+}
+
 const quit = () => {
   process.exit();
 };
