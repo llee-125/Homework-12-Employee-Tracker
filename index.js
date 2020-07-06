@@ -141,48 +141,81 @@ function viewEmployeesByDepartment() {
 
 function addEmployee(userText) {
   const query_role = "SELECT * FROM Role";
+  const query_dept = "SELECT * FROM Department";
+
   connection.query(query_role, function (err, res) {
     const roles = res.map((element) => element.title);
-    console.log(roles);
-    inquirer
-      .prompt([
-        {
-          name: "firstName",
-          type: "input",
-          message:
-            "Enter the employee's first name that you would like to add.",
-        },
-        {
-          name: "lastName",
-          type: "input",
-          message: "Enter the employee's last name that you would like to add.",
-        },
-        {
-          name: "role",
-          type: "rawlist",
-          message: "Select the new employee's role that you would like to add.",
-          choices: roles,
-        },
-      ])
-      .then(function (answer) {
-        let role_id;
-        if (answer.role === "Secretary") {
-          role_id = 1;
-        } else if (answer.role === "SecretaryII") {
-          role_id = 2;
-        } else if (answer.role === "Manager") {
-          role_id = 3;
-        }
-        var query =
-          "INSERT INTO Employee (fname, lname, role_id) VALUES (?, ?, ?)";
-        connection.query(
-          query,
-          [answer.firstName, answer.lastName, role_id],
-          function (err, res) {
-            console.log("Successfully added the employee!");
+
+    connection.query(query_dept, function (err, res) {
+      const departments = res.map((element) => element.name);
+
+      inquirer
+        .prompt([
+          {
+            name: "firstName",
+            type: "input",
+            message:
+              "Enter the employee's first name that you would like to add.",
+          },
+          {
+            name: "lastName",
+            type: "input",
+            message:
+              "Enter the employee's last name that you would like to add.",
+          },
+          {
+            name: "role",
+            type: "rawlist",
+            message:
+              "Select the new employee's role that you would like to add.",
+            choices: roles,
+          },
+          {
+            name: "department",
+            type: "rawlist",
+            message:
+              "Select the new employee's department that you would like to add.",
+            choices: departments,
+          },
+        ])
+        .then(function (answer) {
+          let role_id;
+          if (answer.role === "Secretary") {
+            role_id = 1;
+          } else if (answer.role === "SecretaryII") {
+            role_id = 2;
+          } else if (answer.role === "Manager") {
+            role_id = 3;
           }
-        );
-      });
+        })
+        .then(function (answer) {
+          let name;
+          console.log("line 193");
+
+          if (answer.name === "Sales") {
+            name = 1;
+          }
+          if (answer.name === "Marketing") {
+            name = 2;
+          }
+          if (answer.name === "Accounts Payable") {
+            name = 3;
+          }
+          if (answer.name === "IT") {
+            name = 4;
+          }
+
+          var query =
+            "INSERT INTO Employee (fname, lname, role_id, department.name) VALUES (?, ?, ?, ?)";
+          connection.query(
+            query,
+            [answer.firstName, answer.lastName, role_id, department.name],
+            function (err, res) {
+              console.log("Successfully added the employee!");
+            }
+          );
+        });
+    });
   });
 }
 
