@@ -25,13 +25,37 @@ dept_id INT NOT NULL,
 PRIMARY KEY (id)
 );
 
-INSERT INTO Employee (fname, lname, role_id)
-VALUES ("Mike", "Lee", 1 ), ("Brytney", "Lee", 2), ("Jude", "Lee", 3), ("John", "Smith",3), ("Jane", "Dough",2), ("Mickey", "Mouse",1), ("Donald", "Duck",1);
+INSERT INTO Department
+    (name)
+VALUES
+    ('Sales'),
+    ('Engineering'),
+    ('Finance'),
+    ('Legal');
 
-INSERT INTO Department (name)
-VALUES ("Sales"), ("Marketing"), ("Accounts Payable"), ("IT");
+INSERT INTO Role
+    (title, salary, department_id)
+VALUES
+    ('Sales Lead', 100000, 1),
+    ('Salesperson', 80000, 1),
+    ('Lead Engineer', 150000, 2),
+    ('Software Engineer', 120000, 2),
+    ('Account Manager', 160000, 3),
+    ('Accountant', 125000, 3),
+    ('Legal Team Lead', 250000, 4),
+    ('Lawyer', 190000, 4);
 
-INSERT INTO Role (title, salary, dept_id)
-VALUES ("Secretary", 500.00, 3), ("SecretaryII", 700.00, 3), ("Manager", 5000.00, 2);
+INSERT INTO Employee
+    (first_name, last_name, role_id, manager_id)
+VALUES
+    ('John', 'Doe', 1, NULL),
+    ('Mike', 'Chan', 2, 1),
+    ('Ashley', 'Rodriguez', 3, NULL),
+    ('Kevin', 'Tupik', 4, 3),
+    ('Kunal', 'Singh', 5, NULL),
+    ('Malia', 'Brown', 6, 5),
+    ('Sarah', 'Lourd', 7, NULL),
+    ('Tom', 'Allen', 8, 7);
+
 
 
