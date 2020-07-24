@@ -14,6 +14,7 @@ connection.connect(function (err) {
   searchEmployees();
 });
 
+// function to search ALL employees
 function searchEmployees() {
   inquirer
     .prompt({
@@ -42,7 +43,7 @@ function searchEmployees() {
         // delete
         "Remove role",
 
-        // seelect
+        // select
         "View roles",
         "Add department",
         "View department",
@@ -102,6 +103,7 @@ function searchEmployees() {
     });
 }
 
+// function to view all employees
 function viewAllEmployees() {
   var query = `SELECT employee.id, employee.fname, employee.lname, role.title, department.name AS department, role.salary, 
     CONCAT(manager.fname, ' ', manager.lname) AS manager 
@@ -117,6 +119,7 @@ function viewAllEmployees() {
   });
 }
 
+// function to view employees by dept
 function viewEmployeesByDepartment() {
   const query_dept = "SELECT * FROM Department";
 
@@ -145,6 +148,7 @@ function viewEmployeesByDepartment() {
   });
 }
 
+// function to add employees
 function addEmployee(userText) {
   const query_role = "SELECT * FROM Role";
 
@@ -203,6 +207,7 @@ function addEmployee(userText) {
   });
 }
 
+// function to remove employee
 function removeEmployee() {
   const query_employee =
     "SELECT id, CONCAT(fname, ' ', lname) AS name FROM Employee";
@@ -229,49 +234,183 @@ function removeEmployee() {
       });
   });
 }
+// function to update employee role
+function updateEmployeeRole() {
+  const query_employee =
+    "SELECT id, CONCAT(fname, ' ', lname) AS name FROM Employee";
 
-function songAndAlbumSearch() {
-  inquirer
-    .prompt({
-      name: "artist",
-      type: "input",
-      message: "What artist would you like to search for?",
-    })
-    .then(function (answer) {
-      var query =
-        "SELECT top_albums.year, top_albums.album, top_albums.position, top5000.song, top5000.artist ";
-      query +=
-        "FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year ";
-      query +=
-        "= top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position";
+  connection.query(query_employee, function (err, res) {
+    const employees = res.map((element) => element.name);
 
-      connection.query(query, [answer.artist, answer.artist], function (
-        err,
-        res
-      ) {
-        console.log(res.length + " matches found!");
-        for (var i = 0; i < res.length; i++) {
-          console.log(
-            i +
-              1 +
-              ".) " +
-              "Year: " +
-              res[i].year +
-              " Album Position: " +
-              res[i].position +
-              " || Artist: " +
-              res[i].artist +
-              " || Song: " +
-              res[i].song +
-              " || Album: " +
-              res[i].album
-          );
-        }
-
-        searchEmployees();
+    inquirer
+      .prompt({
+        name: "employee",
+        type: "rawlist",
+        message: "Which employee role would you like to update?",
+        choices: employees,
+      })
+      .then(function (answer) {
+        console.log(answer);
+        connection.query(
+          "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
+          [answer.employee],
+          function (err, res) {
+            console.log("Updated employee role successfully!");
+          }
+        );
       });
-    });
+  });
 }
+
+// function to Add role
+function updateEmployeeRole() {
+  const query_employee =
+    "SELECT id, CONCAT(fname, ' ', lname) AS name FROM Employee";
+
+  connection.query(query_employee, function (err, res) {
+    const employees = res.map((element) => element.name);
+
+    inquirer
+      .prompt({
+        name: "employee",
+        type: "rawlist",
+        message: "Which employee role would you like to update?",
+        choices: employees,
+      })
+      .then(function (answer) {
+        console.log(answer);
+        connection.query(
+          "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
+          [answer.employee],
+          function (err, res) {
+            console.log("Updated employee role successfully!");
+          }
+        );
+      });
+  });
+}
+
+// function to Remove role
+function removeRole() {
+  const query_department = "SELECT id FROM Department";
+
+  connection.query(query_department, function (err, res) {
+    const department = res.map((element) => element.name);
+
+    inquirer
+      .prompt({
+        name: "department",
+        type: "rawlist",
+        message: "Which department would you like to remove?",
+        choices: id,
+      })
+      .then(function (answer) {
+        connection.query(
+          "DELETE FROM Department WHERE id = ?",
+          [answer.employee],
+          function (err, res) {
+            console.log("Deleted role successfully!");
+          }
+        );
+      });
+  });
+}
+
+// function to View role
+function viewRoles() {
+  const query_department = "SELECT id FROM Department";
+
+  connection.query(query_department, function (err, res) {
+    const department_id = res.map((element) => element.name);
+
+    inquirer
+      .prompt({
+        name: "department",
+        type: "rawlist",
+        message: "Which department would you like to view?",
+        choices: department_id,
+      })
+      .then(function (answer) {
+        connection.query(
+          "VIEW FROM Department WHERE id = ?",
+          [answer.employee],
+          function (err, res) {}
+        );
+      });
+  });
+}
+
+// // function to Add Department
+// connection.query(query_employee, function (err, res) {
+//   const employees = res.map((element) => element.name);
+
+//   inquirer
+//     .prompt({
+//       name: "employee",
+//       type: "rawlist",
+//       message: "Which employee role would you like to update?",
+//       choices: employees,
+//     })
+//     .then(function (answer) {
+//       console.log(answer);
+//       connection.query(
+//         "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
+//         [answer.employee],
+//         function (err, res) {
+//           console.log("Updated employee role successfully!");
+//         }
+//       );
+//     });
+// });
+// }
+
+// // function to View department
+// connection.query(query_employee, function (err, res) {
+//   const employees = res.map((element) => element.name);
+
+//   inquirer
+//     .prompt({
+//       name: "employee",
+//       type: "rawlist",
+//       message: "Which employee role would you like to update?",
+//       choices: employees,
+//     })
+//     .then(function (answer) {
+//       console.log(answer);
+//       connection.query(
+//         "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
+//         [answer.employee],
+//         function (err, res) {
+//           console.log("Updated employee role successfully!");
+//         }
+//       );
+//     });
+// });
+// }
+
+// // function to Remove Department
+// connection.query(query_employee, function (err, res) {
+//   const employees = res.map((element) => element.name);
+
+//   inquirer
+//     .prompt({
+//       name: "employee",
+//       type: "rawlist",
+//       message: "Which employee role would you like to update?",
+//       choices: employees,
+//     })
+//     .then(function (answer) {
+//       console.log(answer);
+//       connection.query(
+//         "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
+//         [answer.employee],
+//         function (err, res) {
+//           console.log("Updated employee role successfully!");
+//         }
+//       );
+//     });
+// });
+// }
 
 const quit = () => {
   process.exit();
