@@ -14,7 +14,7 @@ connection.connect(function (err) {
   searchEmployees();
 });
 
-// function to search ALL employees
+// DONE -- function to search ALL employees
 function searchEmployees() {
   inquirer
     .prompt({
@@ -103,7 +103,7 @@ function searchEmployees() {
     });
 }
 
-// function to view all employees
+// DONE -- function to view all employees
 function viewAllEmployees() {
   var query = `SELECT employee.id, employee.fname, employee.lname, role.title, department.name AS department, role.salary, 
     CONCAT(manager.fname, ' ', manager.lname) AS manager 
@@ -119,7 +119,7 @@ function viewAllEmployees() {
   });
 }
 
-// function to view employees by dept
+// DONE -- function to view employees by dept
 function viewEmployeesByDepartment() {
   const query_dept = "SELECT * FROM Department";
 
@@ -148,7 +148,7 @@ function viewEmployeesByDepartment() {
   });
 }
 
-// function to add employees
+// DONE -- function to add employees
 function addEmployee(userText) {
   const query_role = "SELECT * FROM Role";
 
@@ -207,7 +207,7 @@ function addEmployee(userText) {
   });
 }
 
-// function to remove employee
+// DONE -- function to remove employee
 function removeEmployee() {
   const query_employee =
     "SELECT id, CONCAT(fname, ' ', lname) AS name FROM Employee";
@@ -234,80 +234,74 @@ function removeEmployee() {
       });
   });
 }
+
 // function to update employee role
-function updateEmployeeRole() {
-  const query_employee =
-    "SELECT id, CONCAT(fname, ' ', lname) AS name FROM Employee";
+// function updateEmployeeRole() {
+//   const query_employee =
+//     "SELECT id, CONCAT(fname, ' ', lname) AS name FROM Employee";
 
-  connection.query(query_employee, function (err, res) {
-    const employees = res.map((element) => element.name);
+//   connection.query(query_employee, function (err, res) {
+//     const employees = res.map((element) => element.name);
 
-    inquirer
-      .prompt({
-        name: "employee",
-        type: "rawlist",
-        message: "Which employee role would you like to update?",
-        choices: employees,
-      })
-      .then(function (answer) {
-        console.log(answer);
-        connection.query(
-          "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
-          [answer.employee],
-          function (err, res) {
-            console.log("Updated employee role successfully!");
-          }
-        );
-      });
-  });
-}
+//     inquirer
+//       .prompt({
+//         name: "employee",
+//         type: "rawlist",
+//         message: "Which employee role would you like to update?",
+//         choices: employees,
+//       })
+//       .then(function (answer) {
+//         connection.query(
+//           "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
+//           [answer.employee],
+//           function (err, res) {
+//             console.log("Updated employee role successfully!");
+//           }
+//         );
+//       });
+//   });
+// }
 
 // function to Add role
-function updateEmployeeRole() {
-  const query_employee =
-    "SELECT id, CONCAT(fname, ' ', lname) AS name FROM Employee";
+function addRole(userText) {
+  const query_role = `SELECT title* FROM Role`;
 
-  connection.query(query_employee, function (err, res) {
-    const employees = res.map((element) => element.name);
+  connection.query(query_role, function (err, res) {
+    const role = res.map((element) => element.title);
 
     inquirer
-      .prompt({
-        name: "employee",
-        type: "rawlist",
-        message: "Which employee role would you like to update?",
-        choices: employees,
-      })
+      .prompt([
+        {
+          name: "role",
+          type: "input",
+          message: "Enter the new Role you wish to add.",
+        },
+      ])
       .then(function (answer) {
-        console.log(answer);
-        connection.query(
-          "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
-          [answer.employee],
-          function (err, res) {
-            console.log("Updated employee role successfully!");
-          }
-        );
+        var query = `ADD INTO Role (title) VALUES (?)`;
+        connection.query(query, [answer.role_title], function (err, res) {
+          console.log("Successfully added new role!");
+        });
       });
   });
 }
 
 // function to Remove role
 function removeRole() {
-  const query_department = "SELECT id FROM Department";
+  const query_role = `SELECT * FROM Role`;
 
-  connection.query(query_department, function (err, res) {
-    const department = res.map((element) => element.name);
-
+  connection.query(query_role, function (err, res) {
     inquirer
       .prompt({
-        name: "department",
+        name: "role",
         type: "rawlist",
-        message: "Which department would you like to remove?",
-        choices: id,
+        message: "Which role would you like to remove?",
+        choices: role_title,
       })
       .then(function (answer) {
         connection.query(
-          "DELETE FROM Department WHERE id = ?",
-          [answer.employee],
+          `DELETE FROM Role WHERE title = ?`,
+          [answer.role],
           function (err, res) {
             console.log("Deleted role successfully!");
           }
@@ -316,27 +310,14 @@ function removeRole() {
   });
 }
 
-// function to View role
+// DONE -- function to View role
 function viewRoles() {
-  const query_department = "SELECT id FROM Department";
+  var query = `SELECT * FROM Role`;
 
-  connection.query(query_department, function (err, res) {
-    const department_id = res.map((element) => element.name);
-
-    inquirer
-      .prompt({
-        name: "department",
-        type: "rawlist",
-        message: "Which department would you like to view?",
-        choices: department_id,
-      })
-      .then(function (answer) {
-        connection.query(
-          "VIEW FROM Department WHERE id = ?",
-          [answer.employee],
-          function (err, res) {}
-        );
-      });
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    searchEmployees();
   });
 }
 
@@ -364,53 +345,43 @@ function viewRoles() {
 // });
 // }
 
-// // function to View department
-// connection.query(query_employee, function (err, res) {
-//   const employees = res.map((element) => element.name);
+// // DONE -- function to View department
+function viewDepartment() {
+  var query = `SELECT * FROM Department`;
 
-//   inquirer
-//     .prompt({
-//       name: "employee",
-//       type: "rawlist",
-//       message: "Which employee role would you like to update?",
-//       choices: employees,
-//     })
-//     .then(function (answer) {
-//       console.log(answer);
-//       connection.query(
-//         "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
-//         [answer.employee],
-//         function (err, res) {
-//           console.log("Updated employee role successfully!");
-//         }
-//       );
-//     });
-// });
-// }
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    searchEmployees();
+  });
+}
 
-// // function to Remove Department
-// connection.query(query_employee, function (err, res) {
-//   const employees = res.map((element) => element.name);
+// function to Remove Department
+function removeDepartment() {
+  const query_departments = "SELECT * FROM ";
 
-//   inquirer
-//     .prompt({
-//       name: "employee",
-//       type: "rawlist",
-//       message: "Which employee role would you like to update?",
-//       choices: employees,
-//     })
-//     .then(function (answer) {
-//       console.log(answer);
-//       connection.query(
-//         "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
-//         [answer.employee],
-//         function (err, res) {
-//           console.log("Updated employee role successfully!");
-//         }
-//       );
-//     });
-// });
-// }
+  connection.query(query_department, function (err, res) {
+    const departments = res.map((element) => element.name);
+
+    inquirer
+      .prompt({
+        name: "departments",
+        type: "rawlist",
+        message: "Which department would you like to remove?",
+        choices: departments,
+      })
+      .then(function (answer) {
+        console.log(answer);
+        connection.query(
+          "DELETE FROM Department WHERE name = ?",
+          [answer.departments],
+          function (err, res) {
+            console.log("Deleted department successfully!");
+          }
+        );
+      });
+  });
+}
 
 const quit = () => {
   process.exit();
