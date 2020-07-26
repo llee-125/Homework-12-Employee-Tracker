@@ -149,7 +149,7 @@ function viewEmployeesByDepartment() {
 }
 
 // DONE -- function to add employees
-function addEmployee(userText) {
+function addEmployee() {
   const query_role = "SELECT * FROM Role";
 
   connection.query(query_role, function (err, res) {
@@ -236,39 +236,43 @@ function removeEmployee() {
 }
 
 // function to update employee role
-// function updateEmployeeRole() {
-//   const query_employee =
-//     "SELECT id, CONCAT(fname, ' ', lname) AS name FROM Employee";
+function updateEmployeeRole() {
+  const query_employee =
+    "SELECT id, CONCAT(fname, ' ', lname) AS name FROM Employee";
 
-//   connection.query(query_employee, function (err, res) {
-//     const employees = res.map((element) => element.name);
+  connection.query(query_employee, function (err, res) {
+    const employees = res.map((element) => element.name);
 
-//     inquirer
-//       .prompt({
-//         name: "employee",
-//         type: "rawlist",
-//         message: "Which employee role would you like to update?",
-//         choices: employees,
-//       })
-//       .then(function (answer) {
-//         connection.query(
-//           "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
-//           [answer.employee],
-//           function (err, res) {
-//             console.log("Updated employee role successfully!");
-//           }
-//         );
-//       });
-//   });
-// }
+    inquirer
+      .prompt({
+        name: "employee",
+        type: "rawlist",
+        message: "Which employee role would you like to update?",
+        choices: employees,
+      })
+      .then(function (answer) {
+        connection.query(
+          "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
+          [answer.employee],
+          function (err, res) {
+            console.log("Updated employee role successfully!");
+          }
+        );
+      });
+  });
+}
 
 // function to Add role
-function addRole(userText) {
-  const query_role = `SELECT title* FROM Role`;
+function addRole() {
+  const query_dept = `SELECT id, name FROM department`;
 
-  connection.query(query_role, function (err, res) {
-    const role = res.map((element) => element.title);
-
+  connection.query(query_dept, function (err, res) {
+    const departments = res.map((element) => ({
+      id: element.id,
+      name: element.name,
+    }));
+    console.log(res);
+    console.log(departments);
     inquirer
       .prompt([
         {
@@ -276,31 +280,60 @@ function addRole(userText) {
           type: "input",
           message: "Enter the new Role you wish to add.",
         },
+        {
+          name: "salary",
+          type: "input",
+          message: "Enter the salary for the new Role.",
+        },
+        {
+          name: "department",
+          type: "list",
+          message: "Choose the department for the new Role.",
+          choices: departments,
+        },
       ])
       .then(function (answer) {
-        var query = `ADD INTO Role (title) VALUES (?)`;
-        connection.query(query, [answer.role_title], function (err, res) {
-          console.log("Successfully added new role!");
-        });
+        let dept_id;
+        if (answer.department === "Sales") {
+          dept_id = 1;
+        } else if (answer.department === "Engineering") {
+          dept_id = 2;
+        } else if (answer.department === "Finance") {
+          dept_id = 3;
+        } else if (answer.department === "Legal") {
+          dept_id = 4;
+        } else if (answer.department === "Social") {
+          dept_id = 5;
+        }
+
+        var query = `INSERT INTO role (title, salary, dept_id) VALUES (?, ?, ?)`;
+        connection.query(
+          query,
+          [answer.role, answer.salary, answer.department],
+          function (err, res) {
+            console.log("Successfully added new role!");
+          }
+        );
       });
   });
 }
 
 // function to Remove role
 function removeRole() {
-  const query_role = `SELECT * FROM Role`;
+  const query_role = `SELECT * FROM role`;
 
   connection.query(query_role, function (err, res) {
+    const roles = res.map((element) => element.role);
     inquirer
       .prompt({
         name: "role",
-        type: "rawlist",
+        type: "list",
         message: "Which role would you like to remove?",
-        choices: role_title,
+        choices: roles,
       })
       .then(function (answer) {
         connection.query(
-          `DELETE FROM Role WHERE title = ?`,
+          `DELETE FROM role WHERE title = ?`,
           [answer.role],
           function (err, res) {
             console.log("Deleted role successfully!");
@@ -321,29 +354,25 @@ function viewRoles() {
   });
 }
 
-// // function to Add Department
-// connection.query(query_employee, function (err, res) {
-//   const employees = res.map((element) => element.name);
-
-//   inquirer
-//     .prompt({
-//       name: "employee",
-//       type: "rawlist",
-//       message: "Which employee role would you like to update?",
-//       choices: employees,
-//     })
-//     .then(function (answer) {
-//       console.log(answer);
-//       connection.query(
-//         "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
-//         [answer.employee],
-//         function (err, res) {
-//           console.log("Updated employee role successfully!");
-//         }
-//       );
-//     });
-// });
-// }
+// DONE -- function to Add Department
+function addDepartment() {
+  inquirer
+    .prompt({
+      name: "department",
+      type: "input",
+      message: "Which department would you like to add?",
+    })
+    .then(function (answer) {
+      console.log(answer);
+      connection.query(
+        "INSERT INTO department (name) VALUES (?)",
+        [answer.department],
+        function (err, res) {
+          console.log("Added department successfully!");
+        }
+      );
+    });
+}
 
 // // DONE -- function to View department
 function viewDepartment() {
@@ -356,9 +385,9 @@ function viewDepartment() {
   });
 }
 
-// function to Remove Department
+// DONE -- function to Remove Department
 function removeDepartment() {
-  const query_departments = "SELECT * FROM ";
+  const query_department = "SELECT * FROM department";
 
   connection.query(query_department, function (err, res) {
     const departments = res.map((element) => element.name);
