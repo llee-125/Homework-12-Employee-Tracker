@@ -143,6 +143,7 @@ function viewEmployeesByDepartment() {
 
         connection.query(query, [answer.department], function (err, res) {
           console.table(res);
+          searchEmployees();
         });
       });
   });
@@ -201,6 +202,7 @@ function addEmployee() {
           [answer.firstName, answer.lastName, role_id],
           function (err, res) {
             console.log("Successfully added the employee!");
+            searchEmployees();
           }
         );
       });
@@ -229,40 +231,74 @@ function removeEmployee() {
           [answer.employee],
           function (err, res) {
             console.log("Deleted employee successfully!");
+            searchEmployees();
           }
         );
       });
   });
 }
 
-// function to update employee role
+// FIXME: function to update employee role
 function updateEmployeeRole() {
   const query_employee =
     "SELECT id, CONCAT(fname, ' ', lname) AS name FROM Employee";
+  const query_role = "SELECT * FROM role";
 
   connection.query(query_employee, function (err, res) {
     const employees = res.map((element) => element.name);
 
-    inquirer
-      .prompt({
-        name: "employee",
-        type: "rawlist",
-        message: "Which employee role would you like to update?",
-        choices: employees,
-      })
-      .then(function (answer) {
-        connection.query(
-          "UPDATE FROM Employee WHERE CONCAT(fname, ' ', lname) = ?",
-          [answer.employee],
-          function (err, res) {
-            console.log("Updated employee role successfully!");
+    connection.query(query_role, function (err, result) {
+      const roles = result.map((element) => element.title);
+
+      inquirer
+        .prompt([
+          {
+            name: "employee",
+            type: "rawlist",
+            message: "Which employee role would you like to update?",
+            choices: employees,
+          },
+          {
+            name: "role",
+            type: "rawlist",
+            message: "Which role?",
+            choices: roles,
+          },
+        ])
+        .then(function (answer) {
+          let role_id;
+          if (answer.role === "Sales Lead") {
+            role_id = 1;
+          } else if (answer.role === "Salesperson") {
+            role_id = 2;
+          } else if (answer.role === "Lead Engineer") {
+            role_id = 3;
+          } else if (answer.role === "Software Engineer") {
+            role_id = 4;
+          } else if (answer.role === "Account Manager") {
+            role_id = 5;
+          } else if (answer.role === "Accountant") {
+            role_id = 6;
+          } else if (answer.role === "Legal Team Lead") {
+            role_id = 7;
+          } else if (answer.role === "Lawyer") {
+            role_id = 8;
           }
-        );
-      });
+          connection.query(
+            `UPDATE employee SET role_id = ? WHERE CONCAT(fname, ' ', lname) = ?`,
+            [answer.employee, role_id],
+            function (err, res) {
+              console.log(res);
+              console.log("Updated employee role successfully!");
+              searchEmployees();
+            }
+          );
+        });
+    });
   });
 }
 
-// function to Add role
+// DONE -- function to Add role
 function addRole() {
   const query_dept = `SELECT id, name FROM department`;
 
@@ -305,21 +341,20 @@ function addRole() {
         } else if (answer.department === "Social") {
           dept_id = 5;
         }
-
         var query = `INSERT INTO role (title, salary, dept_id) VALUES (?, ?, ?)`;
         connection.query(
           query,
-          [answer.role, answer.salary, answer.department],
-          console.log(answer.role, answer.salary, answer.department),
+          [answer.role, answer.salary, dept_id],
           function (err, res) {
             console.log("Successfully added new role!");
+            searchEmployees();
           }
         );
       });
   });
 }
 
-// function to Remove role
+// DONE -- function to Remove role
 function removeRole() {
   const query_role = `SELECT title FROM role`;
 
@@ -335,9 +370,10 @@ function removeRole() {
       .then(function (answer) {
         connection.query(
           `DELETE FROM role WHERE title = ?`,
-          [answer.title],
+          [answer.role],
           function (err, res) {
             console.log("Deleted role successfully!");
+            searchEmployees();
           }
         );
       });
@@ -370,6 +406,7 @@ function addDepartment() {
         [answer.department],
         function (err, res) {
           console.log("Added department successfully!");
+          searchEmployees();
         }
       );
     });
@@ -407,6 +444,7 @@ function removeDepartment() {
           [answer.departments],
           function (err, res) {
             console.log("Deleted department successfully!");
+            searchEmployees();
           }
         );
       });
@@ -416,3 +454,21 @@ function removeDepartment() {
 const quit = () => {
   process.exit();
 };
+
+function getRoleChoices() {
+  var query = `SELECT * FROM Role`;
+
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+    //const roles = res.map((element) => element.title);
+
+    const roles = [];
+    for (let i = 0; i < res.length; i++) {
+      roles.push(res[i].title);
+    }
+    console.log(roles);
+  });
+}
+
+//getRoleChoices();
+// ["Accountant", "Legal Team Lead", "VP of Finance"]
