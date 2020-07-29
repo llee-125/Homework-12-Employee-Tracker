@@ -272,7 +272,7 @@ function addRole() {
       name: element.name,
     }));
     console.log(res);
-    console.log(departments);
+
     inquirer
       .prompt([
         {
@@ -310,6 +310,7 @@ function addRole() {
         connection.query(
           query,
           [answer.role, answer.salary, answer.department],
+          console.log(answer.role, answer.salary, answer.department),
           function (err, res) {
             console.log("Successfully added new role!");
           }
@@ -320,10 +321,10 @@ function addRole() {
 
 // function to Remove role
 function removeRole() {
-  const query_role = `SELECT * FROM role`;
+  const query_role = `SELECT title FROM role`;
 
   connection.query(query_role, function (err, res) {
-    const roles = res.map((element) => element.role);
+    const roles = res.map((element) => element.title);
     inquirer
       .prompt({
         name: "role",
@@ -334,7 +335,7 @@ function removeRole() {
       .then(function (answer) {
         connection.query(
           `DELETE FROM role WHERE title = ?`,
-          [answer.role],
+          [answer.title],
           function (err, res) {
             console.log("Deleted role successfully!");
           }
