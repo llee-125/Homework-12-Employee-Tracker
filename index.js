@@ -14,7 +14,7 @@ connection.connect(function (err) {
   searchEmployees();
 });
 
-// DONE -- function to search ALL employees
+//-- function to search ALL employees
 function searchEmployees() {
   inquirer
     .prompt({
@@ -22,31 +22,23 @@ function searchEmployees() {
       type: "rawlist",
       message: "What would you like to do?",
       choices: [
-        //done
         "View all employees",
 
-        //same thing as view all employees except use a where clause, this one you will have to do another inquirer prompt
         "View all employees by department",
 
-        // insert
         "Add employee",
 
-        // delete
         "Remove employee",
 
-        // update with a where clause, same thing as manager except role
         "Update employee role",
 
-        // insert
         "Add role",
 
-        // delete
         "Remove role",
 
-        // select
         "View roles",
         "Add department",
-        "View department",
+        "View departments",
         "Remove department",
         "exit",
       ],
@@ -89,8 +81,8 @@ function searchEmployees() {
           addDepartment();
           break;
 
-        case "View department":
-          viewDepartment();
+        case "View departments":
+          viewDepartments();
           break;
 
         case "Remove department":
@@ -103,7 +95,7 @@ function searchEmployees() {
     });
 }
 
-// DONE -- function to view all employees
+//-- function to view all employees
 function viewAllEmployees() {
   var query = `SELECT employee.id, employee.fname, employee.lname, role.title, department.name AS department, role.salary, 
     CONCAT(manager.fname, ' ', manager.lname) AS manager 
@@ -119,7 +111,7 @@ function viewAllEmployees() {
   });
 }
 
-// DONE -- function to view employees by dept
+//-- function to view employees by dept
 function viewEmployeesByDepartment() {
   const query_dept = "SELECT * FROM Department";
 
@@ -149,7 +141,7 @@ function viewEmployeesByDepartment() {
   });
 }
 
-// DONE -- function to add employees
+//-- function to add employees
 function addEmployee() {
   const query_role = "SELECT * FROM Role";
 
@@ -194,6 +186,28 @@ function addEmployee() {
           role_id = 7;
         } else if (answer.role === "Lawyer") {
           role_id = 8;
+        } else if (answer.role === "Vice President") {
+          role_id = 9;
+        } else if (answer.role === "Partner") {
+          role_id = 10;
+        } else if (answer.role === "Associate") {
+          role_id = 11;
+        } else if (answer.role === "Paralegal") {
+          role_id = 12;
+        } else if (answer.role === "Secretary") {
+          role_id = 13;
+        } else if (answer.role === "Cruise Ship Director") {
+          role_id = 14;
+        } else if (answer.role === "Actor") {
+          role_id = 15;
+        } else if (answer.role === "Singer") {
+          role_id = 16;
+        } else if (answer.role === "Friends") {
+          role_id = 17;
+        } else if (answer.role === "Coach") {
+          role_id = 18;
+        } else if (answer.role === "Family") {
+          role_id = 19;
         }
         var query =
           "INSERT INTO Employee (fname, lname, role_id) VALUES (?, ?, ?)";
@@ -209,7 +223,7 @@ function addEmployee() {
   });
 }
 
-// DONE -- function to remove employee
+//-- function to remove employee
 function removeEmployee() {
   const query_employee =
     "SELECT id, CONCAT(fname, ' ', lname) AS name FROM Employee";
@@ -238,7 +252,7 @@ function removeEmployee() {
   });
 }
 
-// FIXME: function to update employee role
+//function to update employee role
 function updateEmployeeRole() {
   const query_employee =
     "SELECT id, CONCAT(fname, ' ', lname) AS name FROM Employee";
@@ -283,6 +297,28 @@ function updateEmployeeRole() {
             role_id = 7;
           } else if (answer.role === "Lawyer") {
             role_id = 8;
+          } else if (answer.role === "Vice President") {
+            role_id = 9;
+          } else if (answer.role === "Partner") {
+            role_id = 10;
+          } else if (answer.role === "Associate") {
+            role_id = 11;
+          } else if (answer.role === "Paralegal") {
+            role_id = 12;
+          } else if (answer.role === "Secretary") {
+            role_id = 13;
+          } else if (answer.role === "Cruise Ship Director") {
+            role_id = 14;
+          } else if (answer.role === "Actor") {
+            role_id = 15;
+          } else if (answer.role === "Singer") {
+            role_id = 16;
+          } else if (answer.role === "Friends") {
+            role_id = 17;
+          } else if (answer.role === "Coach") {
+            role_id = 18;
+          } else if (answer.role === "Family") {
+            role_id = 19;
           }
           connection.query(
             `UPDATE employee SET role_id = ? WHERE CONCAT(fname, ' ', lname) = ?`,
@@ -298,7 +334,7 @@ function updateEmployeeRole() {
   });
 }
 
-// DONE -- function to Add role
+//-- function to Add role
 function addRole() {
   const query_dept = `SELECT id, name FROM department`;
 
@@ -340,6 +376,10 @@ function addRole() {
           dept_id = 4;
         } else if (answer.department === "Social") {
           dept_id = 5;
+        } else if (answer.department === "Friendly") {
+          dept_id = 6;
+        } else if (answer.department === "HR") {
+          dept_id = 7;
         }
         var query = `INSERT INTO role (title, salary, dept_id) VALUES (?, ?, ?)`;
         connection.query(
@@ -354,7 +394,7 @@ function addRole() {
   });
 }
 
-// DONE -- function to Remove role
+//-- function to Remove role
 function removeRole() {
   const query_role = `SELECT title FROM role`;
 
@@ -380,7 +420,7 @@ function removeRole() {
   });
 }
 
-// DONE -- function to View role
+//-- function to View role
 function viewRoles() {
   var query = `SELECT * FROM Role`;
 
@@ -391,7 +431,7 @@ function viewRoles() {
   });
 }
 
-// DONE -- function to Add Department
+//-- function to Add Department
 function addDepartment() {
   inquirer
     .prompt({
@@ -412,8 +452,8 @@ function addDepartment() {
     });
 }
 
-// // DONE -- function to View department
-function viewDepartment() {
+//-- function to View department
+function viewDepartments() {
   var query = `SELECT * FROM Department`;
 
   connection.query(query, function (err, res) {
@@ -423,7 +463,7 @@ function viewDepartment() {
   });
 }
 
-// DONE -- function to Remove Department
+//-- function to Remove Department
 function removeDepartment() {
   const query_department = "SELECT * FROM department";
 
@@ -454,21 +494,3 @@ function removeDepartment() {
 const quit = () => {
   process.exit();
 };
-
-function getRoleChoices() {
-  var query = `SELECT * FROM Role`;
-
-  connection.query(query, function (err, res) {
-    if (err) throw err;
-    //const roles = res.map((element) => element.title);
-
-    const roles = [];
-    for (let i = 0; i < res.length; i++) {
-      roles.push(res[i].title);
-    }
-    console.log(roles);
-  });
-}
-
-//getRoleChoices();
-// ["Accountant", "Legal Team Lead", "VP of Finance"]
